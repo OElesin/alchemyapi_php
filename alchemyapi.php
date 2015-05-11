@@ -101,6 +101,8 @@ class AlchemyAPI {
 		$this->_ENDPOINTS['image']['url'] = '/url/URLGetImage';
 		$this->_ENDPOINTS['image_keywords']['url'] = '/url/URLGetRankedImageKeywords';
 		$this->_ENDPOINTS['image_keywords']['image'] = '/image/ImageGetRankedImageKeywords';
+		$this->_ENDPOINTS['face_detection']['url'] = '/url/URLGetRankedImageFaceTags';
+		$this->_ENDPOINTS['face_detection']['image'] = '/image/ImageGetRankedImageFaceTags';
 		$this->_ENDPOINTS['taxonomy']['url'] = '/url/URLGetRankedTaxonomy';
 		$this->_ENDPOINTS['taxonomy']['html'] = '/html/HTMLGetRankedTaxonomy';
 		$this->_ENDPOINTS['taxonomy']['text'] = '/text/TextGetRankedTaxonomy';
@@ -144,6 +146,38 @@ class AlchemyAPI {
 		else{
 			return $this->analyzeImage($this->_ENDPOINTS['image_keywords'][$flavor], $options, $image);	
 		}
+	}
+	
+	/**
+	  *	Returns metadata for performing face detection and recognition on your Internet-accessible URLs and posted image files.
+	  *	For an overview, please refer to: http://www.alchemyapi.com/products/features/image-tagging/ 
+	  *	For the docs, please refer to: http://www.alchemyapi.com/api/image-tagging/
+	  *	
+	  *	INPUT:
+	  *	flavor -> which version of the call, i.e. url or image.
+	  *	image -> the image to analyze, either the url or image data.
+	  *	options -> various parameters that can be used to adjust how the API works, see below for more info on the available options.
+	  *	
+	  *	Available Options:
+	  *	imagePostMode -> (only applicable to image flavor)
+	  *		not-raw :  pass an unencoded image file with "image=URI_ENCODED_DATA"
+	  *		raw     :  pass an unencoded image file using POST
+	  *	extractMode -> 
+	  *     always-infer    :  (more CPU intensive, more accurate)
+	  *     trust-metadata  :  (less CPU intensive, less accurate) (default)
+	  *     only-metadata   :  (even less CPU intensive, less accurate)
+	  *
+	  *	OUTPUT:
+	  *	The response, already converted from JSON to a PHP object. 
+	*/
+	public function face_detection($flavor, $image, $options) {
+		//Make sure this request supports the flavor
+		if (!array_key_exists($flavor, $this->_ENDPOINTS['face_detection'])) {
+			return array('status'=>'ERROR', 'statusInfo'=>'Face detection for ' . $flavor . ' not available');
+		}
+		//Add the image url to the options and analyze
+		$options[$flavor] = $image;
+		return $this->analyzeImage($this->_ENDPOINTS['face_detection'][$flavor], $options, $image);
 	}
 
 
